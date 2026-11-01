@@ -36,3 +36,10 @@ The trade-off here is simplicity over completeness. The library does **not** shi
 The resolver relies on you to pass the *correct* offset pair for the wall time in question. It does not validate that the naive datetime actually lies within a published DST transition for any specific zone; it only checks whether the two offsets you supply differ by a positive amount (the fall-back step). If you pass offsets that do not correspond to a real transition on that date, the result will still report ``ambiguous=True`` whenever the daylight offset is greater than the standard offset. The library treats offset pairs as authoritative, not calendar dates.
 
 Naive ``fold`` is intentionally not consulted. Its behaviour across Python versions and datetime operations is inconsistent enough that relying on it would make the result non-deterministic across runtimes. Passing explicit offsets sidesteps that entirely.
+
+## Performance
+
+The window keeps a bounded buffer, so `push` is constant time and memory does not
+grow with the length of the stream. `peak` and `trough` are linear in the window
+size, which is the trade that keeps `push` cheap.
+
